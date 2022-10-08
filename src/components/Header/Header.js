@@ -1,12 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import logo from '../../images/logo.png';
 import './Header.css';
 
 const Header = () => {
+    const history = useHistory();
+    // const handleClick=()=>{
+    //     history.push('/');
+    // }
     return (
         <div className='header'>
-            <img className='logo' src={logo} alt="logo" />
+            <img onClick={()=> history.push('/')} className='logo' src={logo} alt="logo" />
             <nav>
                 <Link to="/shop">Shop</Link>
                 <Link to="/review">Order Review</Link>

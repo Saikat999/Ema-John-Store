@@ -5,18 +5,30 @@ import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import InfiniteScroll from "react-infinite-scroll-component";
+
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] =useState([]);
     const [displayProducts, setDisplayProducts] = useState([]);
+    const [limit, setLimit] = useState(5);
+    const [hasMore, setHasMore] = useState(true)
 
+    // console.log('limit',limit)
     useEffect(()=>{
         fetch('./products.JSON')
+
         .then(res => res.json())
         .then(data => {
             setProducts(data);
+            // setDisplayProducts(...displayProducts, data.slice(0,{limit}));
             setDisplayProducts(data);
         })
+        // setLimit(limit+5);
+
     },[]);
 
     useEffect(() => {
@@ -50,8 +62,9 @@ const Shop = () => {
         setCart(newCart);
         //save to local storage
         addToDb(product.key);
+        notify();
     }
-
+    const notify = () => toast("Product Added !");
     const handleSearch = event=>{
          const searchText = event.target.value;
 
@@ -61,35 +74,67 @@ const Shop = () => {
          
     }
 
+   const fetchMoreData = () => {
+    fetch('./products.JSON')
+    .then(res => res.json())
+    .then(data => {
+        setProducts(data);
+        setDisplayProducts(data);
+    });
+    // setLimit(limit+5);
+
+    
+    if(displayProducts.length === 0 || displayProducts.length < 5){
+      setHasMore(false);
+    }
+    };
+
+
     return (
-       <div>
+      <div>
         <div className="search-container">
-            <input
-             type="text" 
-             onChange={handleSearch}
-             placeholder="Search product..." />
+          <input
+            type="text"
+            onChange={handleSearch}
+            placeholder="Search your product..."
+          />
         </div>
-         <div className='shop-container'>
-            <div className="product-container">
-                {
-                    displayProducts.map(product =><Product 
-                        key={product.key}
-                        product={product}
-                        handleAddToCart={handleAddToCart}
-                        >
-                        
-                        </Product>)
-                }
-            </div>
-            <div className="cart-container">
-                <Cart cart={cart}>
-                    <Link to="/review">
-                        <button className="btn-regular">Review Your Order</button>
-                    </Link>
-                </Cart>
-            </div>
+        <div className="shop-container">
+
+          <InfiniteScroll
+            dataLength={displayProducts.length}
+            next={fetchMoreData}
+            hasMore={true}
+            loader={<h4>Loading...</h4>}
+            height={400}
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>Yay! You have seen all the product !!!</b>
+              </p>
+            }
+          >
+
+          <div className="product-container">
+            {displayProducts.map((product) => (
+              <Product
+                key={product.key}
+                product={product}
+                handleAddToCart={handleAddToCart}
+              ></Product>
+            ))} 
+          </div>
+        </InfiniteScroll>
+          <div className="cart-container">
+            <Cart cart={cart}>
+              <Link to="/review">
+                <button className="btn-regular">Review Your Order</button>
+              </Link>
+            </Cart>
+            <ToastContainer
+             />
+          </div>
         </div>
-       </div>
+      </div>
     );
 };
 

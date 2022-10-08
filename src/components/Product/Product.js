@@ -1,6 +1,8 @@
 import React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faShoppingCart } from '@fortawesome/free-solid-svg-icons'
+import 'react-toastify/dist/ReactToastify.css';
 import './Product.css'
 import Rating from 'react-rating';
 
@@ -8,7 +10,7 @@ const Product = (props) => {
     // console.log(props);
     const {name, img, price,stock, seller,star} =props.product;
     const cartIcon = <FontAwesomeIcon icon={faShoppingCart} />
-
+    
     return (
         <div className='product'>
             <div>
